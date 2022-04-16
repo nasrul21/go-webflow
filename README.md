@@ -8,7 +8,7 @@ Webflow REST API Client for Go (Golang)
   - [x] Get Info
   - [x] Get User
 - [ ] Sites
-  - [ ] List Sites
+  - [x] List Sites
   - [ ] Get Specific Site
   - [ ] Publish Site
 - [ ] Domains
