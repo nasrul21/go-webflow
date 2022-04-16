@@ -1,10 +1,12 @@
 # go-webflow
+
 Webflow REST API Client for Go (Golang)
 
 # TODO
-- [ ] Meta
+
+- [x] Meta
   - [x] Get Info
-  - [ ] Get User
+  - [x] Get User
 - [ ] Sites
   - [ ] List Sites
   - [ ] Get Specific Site
