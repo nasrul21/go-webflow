@@ -13,6 +13,8 @@ import (
 type Meta interface {
 	GetInfo() (*model.AuthorizationInfo, *common.Error)
 	GetInfoWithContext(ctx context.Context) (*model.AuthorizationInfo, *common.Error)
+	GetUser() (*model.AuthorizedUser, *common.Error)
+	GetUserWithContext(ctx context.Context) (*model.AuthorizedUser, *common.Error)
 }
 
 type MetaImpl struct {
@@ -39,6 +41,30 @@ func (m *MetaImpl) GetInfoWithContext(ctx context.Context) (*model.Authorization
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/info", m.Opt.BaseURL),
+		m.Opt.ApiKey,
+		header,
+		nil,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (m *MetaImpl) GetUser() (*model.AuthorizedUser, *common.Error) {
+	return m.GetUserWithContext(context.Background())
+}
+
+func (m *MetaImpl) GetUserWithContext(ctx context.Context) (*model.AuthorizedUser, *common.Error) {
+	var response model.AuthorizedUser
+	var header http.Header
+
+	err := m.HttpClient.Call(
+		ctx,
+		http.MethodGet,
+		fmt.Sprintf("%s/user", m.Opt.BaseURL),
 		m.Opt.ApiKey,
 		header,
 		nil,

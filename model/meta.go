@@ -3,6 +3,10 @@ package model
 import "time"
 
 type AuthorizedUser struct {
+	User AuthorizedUserDetail `json:"user"`
+}
+
+type AuthorizedUserDetail struct {
 	ID        string `json:"_id"`
 	Email     string `json:"email"`
 	FirstName string `json:"firstName"`
