@@ -11,8 +11,8 @@ Webflow REST API Client for Go (Golang)
   - [x] List Sites
   - [ ] Get Specific Site
   - [ ] Publish Site
-- [ ] Domains
-  - [ ] List Domains
+- [x] Domains
+  - [x] List Domains
 - [ ] Collections
   - [ ] List Collections
   - [ ] Get Collections with Full Schema

@@ -24,13 +24,10 @@ func (m *httpClientMock) Call(ctx context.Context, method string, path string, s
 		return args.Get(0).(*common.Error)
 	}
 
-	resultString := `[{
-		"_id": "589a331aa51e760df7ccb89d",
-		"name": "test-api-domain.com"
-	}, {
-		"_id": "589a331aa51e760df7ccb89e",
-		"name": "www.test-api-domain.com"
-	}]`
+	resultString := `[
+		{"_id": "589a331aa51e760df7ccb89d","name": "test-api-domain.com"},
+		{"_id": "589a331aa51e760df7ccb89e","name": "www.test-api-domain.com"}
+	]`
 
 	_ = json.Unmarshal([]byte(resultString), &result)
 
