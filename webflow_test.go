@@ -28,7 +28,7 @@ func TestWebflowNew(t *testing.T) {
 }
 
 func TestWebflowWithHttpClient(t *testing.T) {
-	httpClient := &client.HttpClientImpl{}
+	httpClient := &client.ClientImpl{}
 	wf := New("apikey_123").WithHttpClient(httpClient)
 
 	assert.Equal(t, wf.httpClient, httpClient)

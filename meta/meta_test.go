@@ -2,51 +2,53 @@ package meta_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/nasrul21/go-webflow"
+	"github.com/nasrul21/go-webflow/client/mock"
 	"github.com/nasrul21/go-webflow/common"
 	"github.com/nasrul21/go-webflow/model"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type httpClientMock struct {
-	mock.Mock
-}
-
-func (m *httpClientMock) Call(ctx context.Context, method string, path string, secretKey string, header http.Header, params interface{}, result interface{}) *common.Error {
-	args := m.Called(ctx, method, path, secretKey, header, params, result)
-	if args.Get(0) != nil {
-		return args.Get(0).(*common.Error)
-	}
-
-	result.(*model.AuthorizationInfo).ID = "55818d58616600637b9a5786"
-	result.(*model.AuthorizationInfo).CreatedOn = time.Date(2016, 10, 10, 23, 12, 00, 00, time.UTC)
-	result.(*model.AuthorizationInfo).GrantType = "authorization_code"
-	result.(*model.AuthorizationInfo).LastUsed = time.Date(2016, 10, 10, 21, 41, 12, 00, time.UTC)
-	result.(*model.AuthorizationInfo).Orgs = []string{"551ad253f0a9c0686f71ed08"}
-	result.(*model.AuthorizationInfo).Users = []string{"545bbecb7bdd6769632504a7"}
-	result.(*model.AuthorizationInfo).RateLimit = 60
-	result.(*model.AuthorizationInfo).Status = "confirmed"
-	result.(*model.AuthorizationInfo).Application = model.Application{
-		ID:          "55131cd036c09f7d07883dfc",
-		Description: "Testing Application",
-		Homepage:    "https://webflow.com",
-		Name:        "Test App",
-		Owner:       "545bbecb7bdd6769632504a7",
-		OwnerType:   "Person",
-	}
-
-	return nil
-}
-
 func TestGetInfo(t *testing.T) {
-	httpClientMockObj := new(httpClientMock)
+	httpClientMockObj := new(mock.ClientMock)
 	wf := webflow.New("apikey_123").WithHttpClient(httpClientMockObj)
+
+	httpClientMockObj.CallFunc = func(result interface{}) *common.Error {
+		resultString := `{
+			"_id": "55818d58616600637b9a5786",
+			"createdOn": "2016-10-03T23:12:00.755Z",
+			"grantType": "authorization_code",
+			"lastUsed": "2016-10-10T21:41:12.736Z",
+			"sites": [ ],
+			"orgs": [
+				"551ad253f0a9c0686f71ed08"
+			],
+			"workspaces": [ ],
+			"users": [
+				"545bbecb7bdd6769632504a7"
+			],
+			"rateLimit": 60,
+			"status": "confirmed",
+			"application": {
+				"_id": "55131cd036c09f7d07883dfc",
+				"description": "Testing Application",
+				"homepage": "https://webflow.com",
+				"name": "Test App",
+				"owner": "545bbecb7bdd6769632504a7",
+				"ownerType": "Person"
+			}
+		}`
+
+		_ = json.Unmarshal([]byte(resultString), &result)
+
+		return nil
+	}
 
 	testcases := []struct {
 		desc        string
@@ -69,14 +71,16 @@ func TestGetInfo(t *testing.T) {
 				).Return(nil).Once()
 			},
 			expectedRes: &model.AuthorizationInfo{
-				ID:        "55818d58616600637b9a5786",
-				CreatedOn: time.Date(2016, 10, 10, 23, 12, 00, 00, time.UTC),
-				GrantType: "authorization_code",
-				LastUsed:  time.Date(2016, 10, 10, 21, 41, 12, 00, time.UTC),
-				Orgs:      []string{"551ad253f0a9c0686f71ed08"},
-				Users:     []string{"545bbecb7bdd6769632504a7"},
-				RateLimit: 60,
-				Status:    "confirmed",
+				ID:         "55818d58616600637b9a5786",
+				CreatedOn:  time.Date(2016, 10, 03, 23, 12, 00, int(755*time.Millisecond), time.UTC),
+				GrantType:  "authorization_code",
+				LastUsed:   time.Date(2016, 10, 10, 21, 41, 12, int(736*time.Millisecond), time.UTC),
+				Orgs:       []string{"551ad253f0a9c0686f71ed08"},
+				Users:      []string{"545bbecb7bdd6769632504a7"},
+				Sites:      []interface{}{},
+				Workspaces: []interface{}{},
+				RateLimit:  60,
+				Status:     "confirmed",
 				Application: model.Application{
 					ID:          "55131cd036c09f7d07883dfc",
 					Description: "Testing Application",
@@ -119,27 +123,24 @@ func TestGetInfo(t *testing.T) {
 	}
 }
 
-type httpClientMockUser struct {
-	mock.Mock
-}
-
-func (m *httpClientMockUser) Call(ctx context.Context, method string, path string, secretKey string, header http.Header, params interface{}, result interface{}) *common.Error {
-	args := m.Called(ctx, method, path, secretKey, header, params, result)
-	if args.Get(0) != nil {
-		return args.Get(0).(*common.Error)
-	}
-
-	result.(*model.AuthorizedUser).User.ID = "545bbecb7bdd6769632504a7"
-	result.(*model.AuthorizedUser).User.Email = "some@email.com"
-	result.(*model.AuthorizedUser).User.FirstName = "Some"
-	result.(*model.AuthorizedUser).User.LastName = "One"
-
-	return nil
-}
-
 func TestGetUser(t *testing.T) {
-	httpClientMockObj := new(httpClientMockUser)
+	httpClientMockObj := new(mock.ClientMock)
 	wf := webflow.New("apikey_123").WithHttpClient(httpClientMockObj)
+
+	httpClientMockObj.CallFunc = func(result interface{}) *common.Error {
+		resultString := `{
+			"user": {
+				"_id": "545bbecb7bdd6769632504a7",
+				"email": "some@email.com",
+				"firstName": "Some",
+				"lastName": "One"
+			}
+		}`
+
+		_ = json.Unmarshal([]byte(resultString), &result)
+
+		return nil
+	}
 
 	testcases := []struct {
 		desc        string

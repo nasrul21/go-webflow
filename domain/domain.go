@@ -16,14 +16,14 @@ type Domain interface {
 }
 
 type DomainImpl struct {
-	Opt        *common.Option
-	HttpClient client.HttpClient
+	Opt    *common.Option
+	Client client.Client
 }
 
-func New(opt *common.Option, client client.HttpClient) Domain {
+func New(opt *common.Option, client client.Client) Domain {
 	return &DomainImpl{
-		Opt:        opt,
-		HttpClient: client,
+		Opt:    opt,
+		Client: client,
 	}
 }
 
@@ -34,7 +34,7 @@ func (d *DomainImpl) GetListWithContext(ctx context.Context, siteID string) ([]m
 	response := []model.Domain{}
 	var header http.Header
 
-	err := d.HttpClient.Call(
+	err := d.Client.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/sites/%s/domains", d.Opt.BaseURL, siteID),

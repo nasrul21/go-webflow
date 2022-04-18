@@ -12,15 +12,15 @@ import (
 	"github.com/nasrul21/go-webflow/common"
 )
 
-type HttpClient interface {
+type Client interface {
 	Call(ctx context.Context, method string, url string, apiKey string, header http.Header, body interface{}, result interface{}) *common.Error
 }
 
-type HttpClientImpl struct {
+type ClientImpl struct {
 	HttpClient *http.Client
 }
 
-func (h *HttpClientImpl) Call(ctx context.Context, method string, url string, apiKey string, header http.Header, body interface{}, result interface{}) *common.Error {
+func (c *ClientImpl) Call(ctx context.Context, method string, url string, apiKey string, header http.Header, body interface{}, result interface{}) *common.Error {
 	reqBody := []byte("")
 	var req *http.Request
 	var err error
@@ -52,11 +52,11 @@ func (h *HttpClientImpl) Call(ctx context.Context, method string, url string, ap
 	req.Header.Set("accept-version", "1.0.0")
 	req.Header.Set("Content-Type", "application/json")
 
-	return h.doRequest(req, result)
+	return c.doRequest(req, result)
 }
 
-func (h *HttpClientImpl) doRequest(req *http.Request, result interface{}) *common.Error {
-	resp, err := h.HttpClient.Do(req)
+func (c *ClientImpl) doRequest(req *http.Request, result interface{}) *common.Error {
+	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return common.FromGoErr(err)
 	}

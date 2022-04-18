@@ -18,14 +18,14 @@ type Meta interface {
 }
 
 type MetaImpl struct {
-	Opt        *common.Option
-	HttpClient client.HttpClient
+	Opt    *common.Option
+	Client client.Client
 }
 
-func New(opt *common.Option, client client.HttpClient) Meta {
+func New(opt *common.Option, client client.Client) Meta {
 	return &MetaImpl{
-		Opt:        opt,
-		HttpClient: client,
+		Opt:    opt,
+		Client: client,
 	}
 }
 
@@ -37,7 +37,7 @@ func (m *MetaImpl) GetInfoWithContext(ctx context.Context) (*model.Authorization
 	var response model.AuthorizationInfo
 	var header http.Header
 
-	err := m.HttpClient.Call(
+	err := m.Client.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/info", m.Opt.BaseURL),
@@ -61,7 +61,7 @@ func (m *MetaImpl) GetUserWithContext(ctx context.Context) (*model.AuthorizedUse
 	var response model.AuthorizedUser
 	var header http.Header
 
-	err := m.HttpClient.Call(
+	err := m.Client.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/user", m.Opt.BaseURL),
